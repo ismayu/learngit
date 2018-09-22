@@ -5,7 +5,7 @@
 
 int main()
 {
-    const char * test_file = "round_trip.csv";
+    std::string test_file = "round_trip.csv";
     std::ofstream out(test_file);
 
     std::queue<std::vector<std::string>> q;
