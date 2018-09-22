@@ -5,10 +5,10 @@
 // Auxiliary data structures for CSV parser
 
 #include "dmdata_type.h"
+
 #include <math.h>
 #include <vector>
 #include <string>
-#include <string_view>
 #include <iterator>
 #include <unordered_map> // For ColNames
 #include <memory> // For CSVField
@@ -40,7 +40,7 @@ namespace csv {
     */
     class CSVField {
     public:
-        CSVField(std::string_view _sv) : sv(_sv) { };
+        CSVField(const std::string& _sv) : sv(_sv) { };
 
         /** Returns the value casted to the requested type, performing type checking before.
         *  An std::runtime_error will be thrown if a type mismatch occurs, with the exception
@@ -55,20 +55,20 @@ namespace csv {
         *   - double
         *   - long double
         */
-        template<typename T=std::string_view> T get() {
+        template<typename T = std::string> T get() {
             auto dest_type = internals::type_num<T>();
             if (dest_type >= CSV_INT && is_num()) {
                 if (internals::type_num<T>() < this->type())
                     throw std::runtime_error("Overflow error.");
 
-                return static_cast<T>(this->value);
+                return std::stol(std::string(this->sv));
             }
 
-            throw std::runtime_error("Attempted to convert a value of type " + 
+            throw std::runtime_error("Attempted to convert a value of type " +
                 internals::type_name(type()) + " to " + internals::type_name(dest_type) + ".");
         }
 
-        bool operator==(std::string_view other) const;
+        bool operator==(std::string& other) const;
         bool operator==(const long double& other);
 
         DataType type();
@@ -82,7 +82,7 @@ namespace csv {
 
     private:
         long double value = 0;
-        std::string_view sv;
+        std::string sv;
         int _type = -1;
         void get_value();
     };
@@ -104,7 +104,7 @@ namespace csv {
         CSVRow() = default;
         CSVRow(
             std::shared_ptr<std::string> _str,
-            std::string_view _row_str,
+            std::string _row_str,
             std::vector<size_t>&& _splits,
             std::shared_ptr<internals::ColNames> _cnames = nullptr) :
             str(_str),
@@ -122,7 +122,7 @@ namespace csv {
             splits(std::move(_splits)),
             col_names(_cnames)
         {
-            row_str = std::string_view(this->str->c_str());
+            row_str = std::string(this->str->c_str());
         };
 
         bool empty() const { return this->row_str.empty(); }
@@ -132,7 +132,7 @@ namespace csv {
         ///@{
         CSVField operator[](size_t n) const;
         CSVField operator[](const std::string&) const;
-        std::string_view get_string_view(size_t n) const;
+        std::string get_string_view(size_t n) const;
         operator std::vector<std::string>() const;
         ///@}
 
@@ -184,19 +184,46 @@ namespace csv {
     private:
         std::shared_ptr<internals::ColNames> col_names = nullptr;
         std::shared_ptr<std::string> str = nullptr;
-        std::string_view row_str;
+        std::string row_str;
         std::vector<size_t> splits;
     };
 
     // get() specializations
     template<>
     inline std::string CSVField::get<std::string>() {
-        return std::string(this->sv);
+        return this->sv;
     }
 
     template<>
-    inline std::string_view CSVField::get<std::string_view>() {
-        return this->sv;
+    inline int CSVField::get<int>() {
+        if (!is_num())
+            throw std::runtime_error("Not a number.");
+
+        return std::stol(std::string(this->sv));
+    }
+
+    template<>
+    inline unsigned int CSVField::get<unsigned int>() {
+        if (!is_num())
+            throw std::runtime_error("Not a number.");
+
+        return std::stoul(std::string(this->sv));
+    }
+
+    template<>
+    inline long long CSVField::get<long long>() {
+        if (!is_num())
+            throw std::runtime_error("Not a number.");
+
+        return std::stoll(std::string(this->sv));
+    }
+
+    template<>
+    inline unsigned long long CSVField::get<unsigned long long>() {
+        if (!is_num())
+            throw std::runtime_error("Not a number.");
+
+        return std::stoull(std::string(this->sv));
     }
 
     template<>

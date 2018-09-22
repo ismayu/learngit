@@ -31,8 +31,8 @@ namespace csv {
     /** @brief      Return a string view of the nth field
      *  @complexity Constant
      */
-    std::string_view CSVRow::get_string_view(size_t n) const {
-        std::string_view ret(this->row_str);
+    std::string CSVRow::get_string_view(size_t n) const {
+        std::string ret(this->row_str);
         size_t beg = 0, end = row_str.size(),
             r_size = this->size();
 
@@ -125,7 +125,7 @@ namespace csv {
     // CSVField Utility Methods
     //
 
-    bool CSVField::operator==(std::string_view other) const {
+    bool CSVField::operator==(std::string& other) const {
         return other == this->sv;
     }
 
@@ -150,13 +150,13 @@ namespace csv {
         return CSVRow::iterator(this, (int)this->size());
     }
 
-    CSVRow::reverse_iterator CSVRow::rbegin() const {
-        return std::make_reverse_iterator<CSVRow::iterator>(this->end());
-    }
+    //CSVRow::reverse_iterator CSVRow::rbegin() const {
+    //    return std::make_reverse_iterator<CSVRow::iterator>(this->end());
+    //}
 
-    CSVRow::reverse_iterator CSVRow::rend() const {
-        return std::make_reverse_iterator<CSVRow::iterator>(this->begin());
-    }
+    //CSVRow::reverse_iterator CSVRow::rend() const {
+    //    return std::make_reverse_iterator<CSVRow::iterator>(this->begin());
+    //}
 
     CSVRow::iterator::iterator(const CSVRow* _reader, int _i)
         : daddy(_reader), i(_i) {

@@ -5,7 +5,6 @@
 #include <math.h>
 #include <cctype>
 #include <string>
-#include <string_view>
 
 namespace csv {
     /** Enumerates the different CSV field types that are
@@ -34,17 +33,24 @@ namespace csv {
     namespace internals {
         template<typename T>
         DataType type_num();
-
+        template<> inline DataType type_num<char>() { return CSV_INT; }
+        template<> inline DataType type_num<unsigned char>() { return CSV_INT; }
+        template<> inline DataType type_num<short>() { return CSV_INT; }
+        template<> inline DataType type_num<unsigned short>() { return CSV_INT; }
         template<> inline DataType type_num<int>() { return CSV_INT; }
-        template<> inline DataType type_num<long int>() { return CSV_LONG_INT; }
-        template<> inline DataType type_num<long long int>() { return CSV_LONG_LONG_INT; }
+        template<> inline DataType type_num<unsigned int>() { return CSV_INT; }
+        template<> inline DataType type_num<long>() { return CSV_INT; }
+        template<> inline DataType type_num<unsigned long>() { return CSV_INT; }
+        template<> inline DataType type_num<long long>() { return CSV_LONG_LONG_INT; }
+        template<> inline DataType type_num<unsigned long long>() { return CSV_LONG_LONG_INT; }
+        template<> inline DataType type_num<float>() { return CSV_DOUBLE; }
         template<> inline DataType type_num<double>() { return CSV_DOUBLE; }
         template<> inline DataType type_num<long double>() { return CSV_DOUBLE; }
         template<> inline DataType type_num<std::nullptr_t>() { return CSV_NULL; }
         template<> inline DataType type_num<std::string>() { return CSV_STRING; }
 
         std::string type_name(const DataType&);
-        DataType data_type(std::string_view in, long double* const out = nullptr);
+        DataType data_type(const std::string& in, long double* const out = nullptr);
     }
 }
 

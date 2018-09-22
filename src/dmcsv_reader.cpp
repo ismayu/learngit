@@ -1,5 +1,5 @@
 #include "dmcsv_parser.hpp"
-
+#include <memory>
 /** @file
  *  @brief Defines all functionality needed for basic CSV parsing
  */
@@ -26,12 +26,12 @@ namespace csv {
         //
         // GiantStringBuffer
         //
-        std::string_view GiantStringBuffer::get_row() {
+        std::string GiantStringBuffer::get_row() {
             /**
              * Return a string_viewo ver the current_row
              */
                         
-            std::string_view ret(
+            std::string ret(
                 this->buffer->c_str() + this->current_end, // Beginning of string
                 (this->buffer->size() - this->current_end) // Count
             );
@@ -243,10 +243,10 @@ namespace csv {
      *  \snippet tests/test_read_csv.cpp Escaped Comma
      *
      */
-    CSVCollection operator ""_csv(const char* in, size_t n) {    
-        std::string temp(in, n);
-        return parse(temp);
-    }
+    //CSVCollection operator ""_csv(const char* in, size_t n) {    
+    //    std::string temp(in, n);
+    //    return parse(temp);
+    //}
 
     /**
      *  @brief Return a CSV's column names
@@ -362,10 +362,10 @@ namespace csv {
     }
 
     void CSVReader::feed(std::unique_ptr<char[]>&& buff) {
-        this->feed(std::string_view(buff.get()));
+        this->feed(std::string(buff.get()));
     }
 
-    void CSVReader::feed(std::string_view in) {
+    void CSVReader::feed(const std::string& in) {
         /** @brief Parse a CSV-formatted string.
          *
          *  Incomplete CSV fragments can be joined together by calling feed() on them sequentially.
@@ -530,7 +530,7 @@ namespace csv {
         }
 
         const size_t BUFFER_UPPER_LIMIT = std::min(bytes, (size_t)1000000);
-        std::unique_ptr<char[]> buffer(new char[BUFFER_UPPER_LIMIT]);
+        std::unique_ptr<char[]> buffer(new char[BUFFER_UPPER_LIMIT]());
         auto line_buffer = buffer.get();
         std::thread worker(&CSVReader::read_csv_worker, this);
 
@@ -545,7 +545,9 @@ namespace csv {
                 this->feed_buffer.push_back(std::move(buffer));
                 this->feed_cond.notify_one();
 
-                buffer = std::make_unique<char[]>(BUFFER_UPPER_LIMIT); // New pointer
+                std::unique_ptr<char[]> buffer2(new char[BUFFER_UPPER_LIMIT]());
+                std::swap(buffer, buffer2);
+                //buffer = std::make_unique<char[]>(BUFFER_UPPER_LIMIT); // New pointer
                 line_buffer = buffer.get();
             }
         }

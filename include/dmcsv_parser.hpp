@@ -2,7 +2,6 @@
 #ifndef __DMCSV_PARSER_H_INCLUDE__
 #define __DMCSV_PARSER_H_INCLUDE__
 
-#include <string_view>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -81,7 +80,7 @@ namespace csv {
 
         /** Class for reducing number of new string malloc() calls */
         struct GiantStringBuffer {
-            std::string_view get_row();
+            std::string get_row();
             size_t size() const;
             std::string* get();
             std::string* operator->();
@@ -178,7 +177,7 @@ namespace csv {
              *  smaller strings.
              */
             ///@{
-            void feed(std::string_view in);
+            void feed(const std::string& in);
             void end_feed();
             ///@}
 
@@ -305,7 +304,7 @@ namespace csv {
     class CSVStat: public CSVReader {
         public:
             using FreqCount = std::unordered_map<std::string, RowCount>;
-            using TypeCount = std::unordered_map<DataType, RowCount>;
+            using TypeCount = std::unordered_map<int, RowCount>;
 
             void end_feed();
             std::vector<long double> get_mean() const;
@@ -372,7 +371,7 @@ namespace csv {
      *  @brief Convienience functions for parsing small strings
      */
     ///@{
-    CSVCollection operator ""_csv(const char*, size_t);
+    //CSVCollection operator ""_csv(const char*, size_t);
     CSVCollection parse(const std::string& in, CSVFormat format = DEFAULT_CSV);
     ///@}
 
