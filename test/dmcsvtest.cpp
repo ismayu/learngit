@@ -5,8 +5,8 @@
 
 int main()
 {
-    std::string test_file = "round_trip.csv";
-    std::ofstream out(test_file);
+    std::string strFile = "slist.csv";
+    std::ofstream out(strFile);
 
     std::queue<std::vector<std::string>> q;
     q.push({ "name", "age", "ip" });
@@ -22,7 +22,7 @@ int main()
 
     try
     {
-        csv::CSVReader reader(test_file);
+        csv::CSVReader reader(strFile);
         csv::CSVRow rows;
 
         for (size_t i = 0; reader.read_row(rows); i++) {
