@@ -118,11 +118,7 @@ namespace csv {
         template<typename T = std::string> T get() {
             auto dest_type = internals::type_num<T>();
             if (dest_type >= CSV_INT && is_num()) {
-                if (internals::type_num<T>() < this->type())
-                {
-                    throw std::runtime_error("Overflow error.");
-                }
-                return to_number(this->sv);
+                return to_number<T>(this->sv);
             }
 
             throw std::runtime_error("Attempted to convert a value of type " +
