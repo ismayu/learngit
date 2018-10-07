@@ -14,6 +14,65 @@
 #include <memory> // For CSVField
 #include <limits> // For CSVField
 #include <iostream>
+template <typename T = int>
+inline T to_number(const std::string& strIn)
+{
+    return std::stoi(strIn);
+}
+
+template <>
+inline int to_number(const std::string& strIn)
+{
+    return std::stoi(strIn);
+}
+
+template <>
+inline unsigned int to_number(const std::string& strIn)
+{
+    return std::stoul(strIn);
+}
+
+template <>
+inline long to_number(const std::string& strIn)
+{
+    return std::stol(strIn);
+}
+
+template <>
+inline unsigned long to_number(const std::string& strIn)
+{
+    return std::stoul(strIn);
+}
+
+template <>
+inline long long to_number(const std::string& strIn)
+{
+    return std::stoll(strIn);
+}
+
+template <>
+inline unsigned long long to_number(const std::string& strIn)
+{
+    return std::stoull(strIn);
+}
+
+template <>
+inline float to_number(const std::string& strIn)
+{
+    return std::stof(strIn);
+}
+
+template <>
+inline double to_number(const std::string& strIn)
+{
+    return std::stod(strIn);
+}
+
+template <>
+inline long double to_number(const std::string& strIn)
+{
+    return std::stold(strIn);
+}
 
 namespace csv {
     namespace internals {
@@ -63,8 +122,7 @@ namespace csv {
                 {
                     throw std::runtime_error("Overflow error.");
                 }
-
-                return std::stol(std::string(this->sv));
+                return to_number(this->sv);
             }
 
             throw std::runtime_error("Attempted to convert a value of type " +
