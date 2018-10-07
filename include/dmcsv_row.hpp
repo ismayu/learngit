@@ -61,7 +61,7 @@ namespace csv {
             if (dest_type >= CSV_INT && is_num()) {
                 if (internals::type_num<T>() < this->type())
                 {
-                    std::cout << internals::type_num<T>() << this->type() << std::endl;
+                    std::cout << internals::type_num<T>() << " < " << this->type() << std::endl;
                     throw std::runtime_error("Overflow error.");
                 }
 
