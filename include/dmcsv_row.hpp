@@ -14,62 +14,63 @@
 #include <memory> // For CSVField
 #include <limits> // For CSVField
 #include <iostream>
+
 template <typename T = int>
-inline T to_number(const std::string& strIn)
+inline T __to_number(const std::string& strIn)
 {
     return std::stoi(strIn);
 }
 
 template <>
-inline int to_number(const std::string& strIn)
+inline int __to_number(const std::string& strIn)
 {
     return std::stoi(strIn);
 }
 
 template <>
-inline unsigned int to_number(const std::string& strIn)
+inline unsigned int __to_number(const std::string& strIn)
 {
     return std::stoul(strIn);
 }
 
 template <>
-inline long to_number(const std::string& strIn)
+inline long __to_number(const std::string& strIn)
 {
     return std::stol(strIn);
 }
 
 template <>
-inline unsigned long to_number(const std::string& strIn)
+inline unsigned long __to_number(const std::string& strIn)
 {
     return std::stoul(strIn);
 }
 
 template <>
-inline long long to_number(const std::string& strIn)
+inline long long __to_number(const std::string& strIn)
 {
     return std::stoll(strIn);
 }
 
 template <>
-inline unsigned long long to_number(const std::string& strIn)
+inline unsigned long long __to_number(const std::string& strIn)
 {
     return std::stoull(strIn);
 }
 
 template <>
-inline float to_number(const std::string& strIn)
+inline float __to_number(const std::string& strIn)
 {
     return std::stof(strIn);
 }
 
 template <>
-inline double to_number(const std::string& strIn)
+inline double __to_number(const std::string& strIn)
 {
     return std::stod(strIn);
 }
 
 template <>
-inline long double to_number(const std::string& strIn)
+inline long double __to_number(const std::string& strIn)
 {
     return std::stold(strIn);
 }
@@ -118,7 +119,7 @@ namespace csv {
         template<typename T = std::string> T get() {
             auto dest_type = internals::type_num<T>();
             if (dest_type >= CSV_INT && is_num()) {
-                return to_number<T>(this->sv);
+                return __to_number<T>(this->sv);
             }
 
             throw std::runtime_error("Attempted to convert a value of type " +
