@@ -59,12 +59,6 @@ namespace csv {
         template<typename T = std::string> T get() {
             auto dest_type = internals::type_num<T>();
             if (dest_type >= CSV_INT && is_num()) {
-                if (internals::type_num<T>() < this->type())
-                {
-                    std::cout << internals::type_num<T>() << " < " << this->type() << std::endl;
-                    throw std::runtime_error("Overflow error.");
-                }
-
                 return std::stol(std::string(this->sv));
             }
 
