@@ -13,6 +13,7 @@
 #include <unordered_map> // For ColNames
 #include <memory> // For CSVField
 #include <limits> // For CSVField
+#include <iostream>
 
 namespace csv {
     namespace internals {
