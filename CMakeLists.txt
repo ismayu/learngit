@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 PROJECT(dmcsv)
 
-IF (WIN32)  
+IF (WIN32)
     MESSAGE(STATUS "Now is windows")
 
     SET(DMOS_NAME "win")
@@ -18,18 +18,18 @@ IF (WIN32)
             ENDIF()
     	ENDIF()
     ENDIF()
-ELSEIF (APPLE)  
+ELSEIF (APPLE)
     MESSAGE(STATUS "Now is Apple systems")  
 
     SET(DMOS_NAME "mac") 
 
     SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread" )
-ELSEIF (UNIX)  
+ELSEIF (UNIX)
     MESSAGE(STATUS "Now is UNIX-like OS")  
  
     SET(DMOS_NAME "lin") 
     
-    SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread" )    
+    SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -g" )
 ENDIF ()
 
 ADD_DEFINITIONS(-DUSE_DMCSV)
