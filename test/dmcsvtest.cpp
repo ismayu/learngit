@@ -12,7 +12,7 @@ TEST(dmcsv, dmcsv_write) {
     std::queue<std::vector<std::string>> q;
     q.push({ "name", "age", "ip" });
 
-    for (int i = 0; i < 200000; ++i)
+    for (int i = 0; i < 2000000; ++i)
     {
         dmcsv_count += i;
         q.push({ "Andy" + std::to_string(i), std::to_string(i), "172.30.10.21" });
