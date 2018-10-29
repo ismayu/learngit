@@ -32,23 +32,17 @@ TEST(dmcsv, dmcsv_write) {
 }
 
 TEST(dmcsv, dmcsv_read) {
-    try
-    {
-        uint64_t qwCount = dmcsv_count;
 
-        csv::CSVReader reader(strFile, csv::DEFAULT_CSV);
-        csv::CSVRow rows;
-        for (size_t i = 0; reader.read_row(rows); i++) {
-            //qwCount -= rows["age"].get<uint64_t>();
-            qwCount -= rows[1].get<uint64_t>();
-            //std::cout << rows["name"].get<std::string>() << "," << rows["age"].get<std::uint64_t>() << "," << rows["ip"].get<std::string>() << std::endl;
-        }
-        std::cout << qwCount << std::endl;
+    uint64_t qwCount = dmcsv_count;
+
+    csv::CSVReader reader(strFile, csv::DEFAULT_CSV);
+    csv::CSVRow rows;
+    for (size_t i = 0; reader.read_row(rows); i++) {
+        //qwCount -= rows["age"].get<uint64_t>();
+        qwCount -= rows[1].get<uint64_t>();
+        //std::cout << rows["name"].get<std::string>() << "," << rows["age"].get<std::uint64_t>() << "," << rows["ip"].get<std::string>() << std::endl;
     }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    std::cout << qwCount << std::endl;
 }
 
 TEST(dsv_filter, dsv_filter_read) {
