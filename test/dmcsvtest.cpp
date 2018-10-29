@@ -6,22 +6,26 @@
 
 uint64_t dmcsv_count = 0;
 std::string strFile = "slist.csv";
-TEST(dmcsv, dmcsv_write) {
-    std::ofstream out(strFile);
+std::queue<std::vector<std::string>> q;
 
-    std::queue<std::vector<std::string>> q;
+TEST(dmcsv, dmcsv_init) {
+    std::ofstream out(strFile);
     q.push({ "name", "age", "ip" });
 
-    for (int i = 0; i < 2000000; ++i)
+    for (int i = 0; i < 1000000; ++i)
     {
         dmcsv_count += i;
         q.push({ "Andy" + std::to_string(i), std::to_string(i), "172.30.10.21" });
     }
 
+    out.close();
+}
+
+TEST(dmcsv, dmcsv_write) {
+    std::ofstream out(strFile);
     auto writer = csv::make_csv_writer(out);
     for (; !q.empty(); q.pop())
         writer.write_row(q.front());
-
     out.close();
 }
 
@@ -44,8 +48,6 @@ TEST(dmcsv, dmcsv_read) {
         std::cout << e.what() << std::endl;
     }
 }
-
-uint64_t dsv_filter_count = 0;
 
 TEST(dsv_filter, dsv_filter_read) {
 
