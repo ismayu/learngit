@@ -37,7 +37,7 @@ namespace csv {
             );
 
             this->current_end = this->buffer->size();
-            return ret;
+            return std::move(ret);
         }
 
         void GiantStringBuffer::operator+=(const char ch) {
@@ -147,7 +147,7 @@ namespace csv {
             for (auto it = delims.begin(); it != delims.end(); ++it) {
                 format.delim = *it;
                 Guesser guess(format);
-                guess.read_csv(filename, 500000);
+                guess.read_csv(filename, FAST_CHUNK_SIZE);
 
                 // Most common row length
                 auto max = std::max_element(guess.row_tally.begin(), guess.row_tally.end(),
@@ -321,9 +321,23 @@ namespace csv {
      *  \snippet tests/test_read_csv.cpp CSVField Example
      *
      */
+    
+    size_t get_file_size(const char* filename)
+    {
+        FILE* fp = fopen(filename, "rb");
+        if (NULL == fp) return 0;
+        struct stat s;
+        int fd = fileno(fp);
+        fstat(fd, &s);
+        fclose(fp);
+        return s.st_size;
+    }
+
     CSVReader::CSVReader(const std::string& filename, CSVFormat format) {
         if (format.delim == '\0')
+        {
             format = guess_format(filename);
+        }
 
         this->col_names = std::make_shared<internals::ColNames>(format.col_names);
         delimiter = format.delim;
@@ -332,7 +346,7 @@ namespace csv {
         strict = format.strict;
 
         // Read first 500KB of CSV
-        read_csv(filename, 500000, false);
+        read_csv(filename, get_file_size(filename.c_str()), false);
     }
 
     /** @brief Return the format of the original raw CSV */
@@ -362,7 +376,7 @@ namespace csv {
     }
 
     void CSVReader::feed(std::unique_ptr<char[]>&& buff) {
-        this->feed(std::string(buff.get()));
+        this->feed(buff.get());
     }
 
     void CSVReader::feed(const std::string& in) {
@@ -529,36 +543,59 @@ namespace csv {
             #endif
         }
 
-        const size_t BUFFER_UPPER_LIMIT = std::min(bytes, (size_t)1000000);
-        std::unique_ptr<char[]> buffer(new char[BUFFER_UPPER_LIMIT]());
-        auto line_buffer = buffer.get();
-        std::thread worker(&CSVReader::read_csv_worker, this);
+        if (usethread)
+        {
+            const size_t BUFFER_UPPER_LIMIT = std::min(bytes, (size_t)PAGE_SIZE*10);
+            std::unique_ptr<char[]> buffer(new char[BUFFER_UPPER_LIMIT]);
+            auto line_buffer = buffer.get();
+            std::thread worker(&CSVReader::read_csv_worker, this);
 
-        for (size_t processed = 0; processed < bytes; ) {
-            char * result = std::fgets(line_buffer, PAGE_SIZE, this->infile);
-            if (result == NULL) break;
-            line_buffer += std::strlen(line_buffer);
+            for (size_t processed = 0; processed < bytes; ) {
 
-            if ((line_buffer - buffer.get()) >= 0.9 * BUFFER_UPPER_LIMIT) {
-                processed += (line_buffer - buffer.get());
-                std::unique_lock<std::mutex> lock{ this->feed_lock };
-                this->feed_buffer.push_back(std::move(buffer));
-                this->feed_cond.notify_one();
+                char * result = std::fgets(line_buffer, PAGE_SIZE, this->infile);
 
-                std::unique_ptr<char[]> buffer2(new char[BUFFER_UPPER_LIMIT]());
-                std::swap(buffer, buffer2);
-                //buffer = std::make_unique<char[]>(BUFFER_UPPER_LIMIT); // New pointer
-                line_buffer = buffer.get();
+                if (result == NULL) break;
+                size_t len = std::strlen(line_buffer);
+
+                line_buffer += len;
+
+                if ((line_buffer - buffer.get()) + PAGE_SIZE >= BUFFER_UPPER_LIMIT) {
+                    processed += (line_buffer - buffer.get());
+                    std::unique_lock<std::mutex> lock{ this->feed_lock };
+                    this->feed_buffer.push_back(std::move(buffer));
+                    this->feed_cond.notify_one();
+
+                    std::unique_ptr<char[]> buffer2(new char[BUFFER_UPPER_LIMIT]);
+                    std::swap(buffer, buffer2);
+                    //buffer = std::make_unique<char[]>(BUFFER_UPPER_LIMIT); // New pointer
+                    line_buffer = buffer.get();
+                }
             }
+
+            // Feed remaining bits
+            std::unique_lock<std::mutex> lock{ this->feed_lock };
+            this->feed_buffer.push_back(std::move(buffer));
+            this->feed_buffer.push_back(nullptr); // Termination signal
+            this->feed_cond.notify_one();
+            lock.unlock();
+            worker.join();
+        }
+        else
+        {
+            const size_t BUFFER_UPPER_LIMIT = bytes + PAGE_SIZE;
+            std::unique_ptr<char[]> buffer(new char[BUFFER_UPPER_LIMIT]);
+            auto line_buffer = buffer.get();
+
+            for (;;) {
+                char * result = std::fgets(line_buffer, PAGE_SIZE, this->infile);
+                if (result == NULL) break;
+                size_t len = std::strlen(line_buffer);
+                line_buffer += len;
+            }
+
+            this->feed(std::move(buffer));
         }
 
-        // Feed remaining bits
-        std::unique_lock<std::mutex> lock{ this->feed_lock };
-        this->feed_buffer.push_back(std::move(buffer));
-        this->feed_buffer.push_back(nullptr); // Termination signal
-        this->feed_cond.notify_one();
-        lock.unlock();
-        worker.join();
 
         if (std::feof(this->infile)) {
             this->end_feed();

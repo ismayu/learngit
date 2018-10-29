@@ -97,7 +97,10 @@ namespace csv {
     /** @brief For functions that lazy load a large CSV, this determines how
      *         many bytes are read at a time
      */
-    const size_t ITERATION_CHUNK_SIZE = 10000000; // 10MB
+    
+    const size_t FAST_CHUNK_SIZE = 500 * 1024; // 500KB
+
+    const size_t ITERATION_CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
 
     /** @brief A dummy variable used to indicate delimiter should be guessed */
     const CSVFormat GUESS_CSV = { '\0', '"', 0, {}, false };
@@ -255,7 +258,7 @@ namespace csv {
             char quote_char;               /**< @brief Quote character */
             int header_row;                /**< @brief Line number of the header row (zero-indexed) */
             bool strict = false;           /**< @brief Strictness of parser */
-
+            bool usethread = false;
             std::vector<CSVReader::ParseFlags> parse_flags; /**< @brief
             A table where the (i + 128)th slot gives the ParseFlags for ASCII character i */
             ///@}

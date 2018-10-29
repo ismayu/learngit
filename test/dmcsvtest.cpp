@@ -4,19 +4,19 @@
 #include <queue>
 
 #include "gtest.h"
+#include "dsv_filter.hpp"
 
+uint64_t dmcsv_count = 0;
+std::string strFile = "slist.csv";
 TEST(dmcsv, dmcsv_write) {
-    std::string strFile = "slist.csv";
     std::ofstream out(strFile);
 
     std::queue<std::vector<std::string>> q;
     q.push({ "name", "age", "ip" });
-    q.push({ "Tom", std::to_string(std::numeric_limits<uint64_t>::max()).c_str(), "172.30.10.29" });
-    q.push({ "Plus", "22", "172.30.10.18" });
-    q.push({ "Andy", "27", "172.30.10.21" });
 
-    for (int i = 0; i < 100000; ++i)
+    for (int i = 0; i < 200000; ++i)
     {
+        dmcsv_count += i;
         q.push({ "Andy" + std::to_string(i), std::to_string(i), "172.30.10.21" });
     }
 
@@ -30,12 +30,14 @@ TEST(dmcsv, dmcsv_write) {
 TEST(dmcsv, dmcsv_read) {
     try
     {
-        std::string strFile = "slist.csv";
+        uint64_t qwCount = dmcsv_count;
+
         csv::CSVReader reader(strFile, csv::DEFAULT_CSV);
         csv::CSVRow rows;
-        uint64_t qwCount = 0;
         for (size_t i = 0; reader.read_row(rows); i++) {
-            qwCount += rows["age"].get<uint64_t>();
+            //qwCount -= rows["age"].get<uint64_t>();
+            qwCount -= rows[1].get<uint64_t>();
+            //std::cout << rows["name"].get<std::string>() << "," << rows["age"].get<std::uint64_t>() << "," << rows["ip"].get<std::string>() << std::endl;
         }
         std::cout << qwCount << std::endl;
     }
@@ -43,4 +45,25 @@ TEST(dmcsv, dmcsv_read) {
     {
         std::cout << e.what() << std::endl;
     }
+}
+
+uint64_t dsv_filter_count = 0;
+
+TEST(dsv_filter, dsv_filter_read) {
+
+    dsv_filter oFilter;
+    if (!oFilter.load(strFile))
+    {
+        return;
+    }
+
+    uint64_t qwCount = dmcsv_count;
+
+    for (int i = 1; i < static_cast<int>(oFilter.grid().row_count()); ++i)
+    {
+        strtk::token_grid::row_type row = oFilter.grid().row(i);
+        qwCount -= row.get<uint64_t>(1);
+    }
+
+    std::cout << qwCount << std::endl;
 }
