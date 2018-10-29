@@ -17,7 +17,6 @@ namespace csv {
         const int PAGE_SIZE = getpagesize();
     #elif defined(__linux__) 
         #include <unistd.h>
-        #include<sys/stat.h>
         const int PAGE_SIZE = getpagesize();
     #else
         const int PAGE_SIZE = 4096;
