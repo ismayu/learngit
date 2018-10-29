@@ -254,48 +254,48 @@ namespace csv {
 
     template<>
     inline int CSVField::get<int>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
-        return std::stol(std::string(this->sv));
+        return std::stol(this->sv);
     }
 
     template<>
     inline unsigned int CSVField::get<unsigned int>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
-        return std::stoul(std::string(this->sv));
+        return std::stoul(this->sv);
     }
 
     template<>
     inline long long CSVField::get<long long>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
-        return std::stoll(std::string(this->sv));
+        return std::stoll(this->sv);
     }
 
     template<>
     inline unsigned long long CSVField::get<unsigned long long>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
-        return std::stoull(std::string(this->sv));
+        return std::stoull(this->sv);
     }
 
     template<>
     inline double CSVField::get<double>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
         return this->value;
     }
 
     template<>
     inline long double CSVField::get<long double>() {
-        if (!is_num())
-            throw std::runtime_error("Not a number.");
+        //if (!is_num())
+        //    throw std::runtime_error("Not a number.");
 
         return this->value;
     }
