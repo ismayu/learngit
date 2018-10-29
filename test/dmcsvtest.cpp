@@ -24,8 +24,10 @@ TEST(dmcsv, dmcsv_init) {
 TEST(dmcsv, dmcsv_write) {
     std::ofstream out(strFile);
     auto writer = csv::make_csv_writer(out);
+
     for (; !q.empty(); q.pop())
         writer.write_row(q.front());
+
     out.close();
 }
 
