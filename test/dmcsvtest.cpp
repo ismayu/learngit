@@ -1,9 +1,8 @@
+#include "gtest.h"
+
 #include "dmcsv_parser.hpp"
 #include "dmcsv_writer.hpp"
 #include "dsv_filter.hpp"
-#include "gtest.h"
-
-#include "dmos.h"
 
 uint64_t dmcsv_count = 0;
 std::string strFile = "slist.csv";
