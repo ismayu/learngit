@@ -1,6 +1,6 @@
 #include "dmcsv_parser.hpp"
 #include <memory>
-
+#include <sys/stat.h>
 /** @file
  *  @brief Defines all functionality needed for basic CSV parsing
  */
