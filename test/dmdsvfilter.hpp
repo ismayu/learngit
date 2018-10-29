@@ -1,6 +1,6 @@
 
-#ifndef __DSV_FILTER_H_INCLUDE__
-#define __DSV_FILTER_H_INCLUDE__
+#ifndef __DMDSVFILTER_H_INCLUDE__
+#define __DMDSVFILTER_H_INCLUDE__
 
 #include <string>
 #include <deque>
@@ -109,4 +109,4 @@ private:
     strtk::token_grid::row_type row_;
 };
 
-#endif // __DSV_FILTER_H_INCLUDE__
+#endif // __DMDSVFILTER_H_INCLUDE__
