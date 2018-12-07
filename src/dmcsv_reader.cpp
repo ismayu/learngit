@@ -6,6 +6,18 @@
  */
 
 namespace csv {
+
+    size_t get_file_size(const char* filename)
+    {
+        FILE* fp = fopen(filename, "rb");
+        if (NULL == fp) return 0;
+        struct stat s;
+        int fd = fileno(fp);
+        fstat(fd, &s);
+        fclose(fp);
+        return s.st_size;
+    }
+
     namespace internals {
         bool is_equal(double a, double b, double epsilon) {
             /** Returns true if two doubles are about the same */
@@ -148,7 +160,7 @@ namespace csv {
             for (auto it = delims.begin(); it != delims.end(); ++it) {
                 format.delim = *it;
                 Guesser guess(format);
-                guess.read_csv(filename, FAST_CHUNK_SIZE);
+                guess.read_csv(filename, get_file_size(filename.c_str()));
 
                 // Most common row length
                 auto max = std::max_element(guess.row_tally.begin(), guess.row_tally.end(),
@@ -322,17 +334,7 @@ namespace csv {
      *  \snippet tests/test_read_csv.cpp CSVField Example
      *
      */
-    
-    size_t get_file_size(const char* filename)
-    {
-        FILE* fp = fopen(filename, "rb");
-        if (NULL == fp) return 0;
-        struct stat s;
-        int fd = fileno(fp);
-        fstat(fd, &s);
-        fclose(fp);
-        return s.st_size;
-    }
+
 
     CSVReader::CSVReader(const std::string& filename, CSVFormat format) {
         if (format.delim == '\0')
@@ -588,7 +590,7 @@ namespace csv {
             auto line_buffer = buffer.get();
 
             for (;;) {
-                char * result = std::fgets(line_buffer, PAGE_SIZE, this->infile);
+                char * result = std::fgets(line_buffer, BUFFER_UPPER_LIMIT, this->infile);
                 if (result == NULL) break;
                 size_t len = std::strlen(line_buffer);
                 line_buffer += len;

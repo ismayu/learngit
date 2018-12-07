@@ -13,10 +13,10 @@ TEST(dmcsv, dmcsv_init) {
 
     uint64_t qwCount = 0;
 
-    for (int i = 0; i < 1000000; ++i)
+    for (int i = 0; i < 100000; ++i)
     {
         qwCount += i;
-        q.push({ "Andy" + std::to_string(i), std::to_string(i), "172.30.10.21" });
+        q.push({ "Andy" + std::to_string(i), std::to_string(i), "172.30,10.21" });
     }
     std::cout << qwCount << std::endl;
     out.close();
