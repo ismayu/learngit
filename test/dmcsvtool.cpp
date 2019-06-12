@@ -1,12 +1,16 @@
 
+#include "dmos.h"
+#include "dmutil.h"
+
 #include "dmcsv_parser.hpp"
 #include "dmcsv_writer.hpp"
+
 #include <vector>
 #include <queue>
 
 int main( int argc, char** argv )
 {
-    std::string strFile = "slist.csv";
+    std::string strFile = DMGetRootPath() + PATH_DELIMITER_STR + "slist.csv";
 
     std::queue<std::vector<std::string>> q;
 
