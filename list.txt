@@ -4,3 +4,4 @@ dmdscreatureconfig.monsterdroprates.csv
 xxx.csv
 xxxx.csv
 xxxx
+xxx
