@@ -1,0 +1,6 @@
+a.csv
+dmdscreatureconfig.itemtemplates.csv
+dmdscreatureconfig.monsterdroprates.csv
+xxx.csv
+xxxx.csv
+xxxx
